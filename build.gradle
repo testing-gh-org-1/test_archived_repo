@@ -1,0 +1,79 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.example'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Servlet API for web applications
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    
+    // Spring Framework for SpEL injection examples
+    implementation 'org.springframework:spring-expression:5.3.30'
+    implementation 'org.springframework:spring-core:5.3.30'
+    
+    // Expression Language (EL) API
+    implementation 'javax.el:javax.el-api:3.0.0'
+    implementation 'org.glassfish:javax.el:3.0.0'
+    
+    // Cryptography libraries
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+    
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation 'ch.qos.logback:logback-classic:1.4.11'
+    
+    // MySQL Connector
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    
+    // Testing dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+}
+
+application {
+    mainClass = 'com.example.demo.HelloWorld'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// Task to run different main classes
+task runCalculator(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.example.demo.Calculator'
+}
+
+task runPerson(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.example.demo.Person'
+}
+
+task runWeakCryptography(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.example.demo.WeakCryptography'
+}
+
+task runWeakHashFunction(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.example.demo.WeakHashFunction'
+}
+
+// Compiler options
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-Xlint:deprecation', '-Xlint:unchecked']
+}
