@@ -40,7 +40,11 @@ test_archived_repo/
 │   │   │   ├── AuthenticationBypassVulnerabilities.java (CWE-287, CWE-290)
 │   │   │   ├── CertificateValidationVulnerabilities.java (CWE-295, CWE-297)
 │   │   │   ├── CryptographicStorageVulnerabilities.java (CWE-311, CWE-312, CWE-315, CWE-319, CWE-326)
-│   │   │   └── AdditionalAuthorizationVulnerabilities.java (CWE-285)
+│   │   │   ├── AdditionalAuthorizationVulnerabilities.java (CWE-285)
+│   │   │   ├── AdditionalRandomnessVulnerabilities.java (CWE-330, CWE-337)
+│   │   │   ├── RaceConditionVulnerabilities.java (CWE-367)
+│   │   │   ├── AdditionalCryptographicVulnerabilities.java (CWE-327, CWE-328)
+│   │   │   └── CodeQualityAndResourceVulnerabilities.java (CWE-382, CWE-398, CWE-400)
 │   │   └── resources/
 │   │       ├── application.properties
 │   │       └── logback.xml
@@ -123,24 +127,37 @@ test_archived_repo/
 - Displays environment variables in debug mode
 
 ### CWE-327: Use of Broken or Risky Cryptographic Algorithm
-**File:** `WeakCryptography.java`
+**Files:** `WeakCryptography.java`, `AdditionalCryptographicVulnerabilities.java`
 - Uses MD5 for password hashing (broken algorithm)
 - Uses SHA-1 for cryptographic purposes (weak)
 - Uses DES encryption (insecure, small key size)
 - Uses RC4 stream cipher (broken)
 - Uses AES in ECB mode (insecure mode)
+- Using DES with static keys
+- Using deprecated 3DES encryption
+- AES with static initialization vectors (IV)
+- Blowfish with 64-bit blocks (birthday attack vulnerable)
+- RSA with weak 1024-bit key size
+- Null cipher (no encryption at all)
 
 ### CWE-328: Use of Weak Hash
-**File:** `WeakHashFunction.java`
+**Files:** `WeakHashFunction.java`, `AdditionalCryptographicVulnerabilities.java`
 - Uses MD5 for password hashing
 - Uses SHA-1 for sensitive data hashing
 - Uses weak hashing for authentication tokens
 - Uses MD5/SHA-1 for session ID generation
 - Uses weak hashing for API key storage
+- MD5 for file integrity checking
+- SHA-1 for digital signatures
+- MD5-based HMAC implementation
+- Truncated hash comparisons
+- CRC32 for security purposes (non-cryptographic)
+- Adler32 for integrity checking
 
 ### CWE-330: Use of Insufficiently Random Values
+### CWE-337: Predictable Seed in Pseudo-Random Number Generator (PRNG)
 ### CWE-338: Use of Cryptographically Weak Pseudo-Random Number Generator (PRNG)
-**File:** `WeakRandomnessVulnerability.java`
+**Files:** `WeakRandomnessVulnerability.java`, `AdditionalRandomnessVulnerabilities.java`
 - Weak random for session ID generation
 - Weak PRNG for authentication tokens
 - Predictable password reset tokens
@@ -148,6 +165,17 @@ test_archived_repo/
 - Predictable CAPTCHA generation
 - Weak OTP generation
 - Predictable transaction IDs
+- Using current time as PRNG seed
+- Using fixed seed values
+- Math.random() for security tokens
+- Seed derived from username hashCode
+- MD5-based UUID (not random)
+- Reusing same Random instance
+- Seed based on counter or thread ID
+- User-controlled PRNG seeds
+- Weak random for lottery/gambling
+- Weak nonce generation
+- Combining weak seeds
 
 ### CWE-352: Cross-Site Request Forgery (CSRF)
 **File:** `CSRFVulnerability.java`
@@ -157,7 +185,59 @@ test_archived_repo/
 - Email change without verification
 - Admin actions without CSRF protection
 
+### CWE-367: Time-of-check Time-of-use (TOCTOU) Race Condition
+**File:** `RaceConditionVulnerabilities.java`
+- Classic TOCTOU in file operations (check exists, then create)
+- TOCTOU in permission checks
+- TOCTOU in file deletion
+- TOCTOU with symbolic links
+- Race condition in directory traversal checks
+- Race condition in temp file creation
+- TOCTOU in file ownership checks
+- Race condition in file rename operations
+- TOCTOU in access control decisions
+- Race condition with shared resources (balance checking)
+- TOCTOU in session validation
+- File existence check before creation race
+
+### CWE-382: J2EE Bad Practices: Use of System.exit()
+**File:** `CodeQualityAndResourceVulnerabilities.java`
+- Using System.exit() in application server context
+- System.exit() in servlet allowing remote shutdown
+- Runtime.halt() forcing JVM termination
+- Crashing entire application server from web request
+
+### CWE-398: Poor Code Quality
+**File:** `CodeQualityAndResourceVulnerabilities.java`
+- Empty catch blocks silently swallowing exceptions
+- Catching overly broad Exception types
+- Magic numbers without named constants
+- Deeply nested conditional logic
+- God classes with too many responsibilities
+- Methods with excessive parameters
+- Duplicated code across methods
+- Commented-out code left in production
+- Methods that are too long (100+ lines)
+- Poor separation of concerns
+
 ### CWE-400: Uncontrolled Resource Consumption
+**Files:** `ResourceManagementVulnerability.java`, `CodeQualityAndResourceVulnerabilities.java`
+- Unclosed file resources
+- Database connections not closed
+- Unbounded loops controlled by user input
+- Memory exhaustion through large allocations
+- ZIP bomb vulnerabilities
+- Regular expression denial of service (ReDoS)
+- Thread exhaustion
+- Disk space exhaustion
+- Unbounded memory allocation from user input
+- Unbounded collection growth
+- Resource-intensive regex patterns
+- Nested loops with user-controlled bounds
+- Reading entire large files into memory
+- Unlimited socket connections
+- Creating unlimited threads without thread pool
+
 ### CWE-404: Improper Resource Shutdown or Release
 **File:** `ResourceManagementVulnerability.java`
 - Unclosed file resources
@@ -509,13 +589,13 @@ The repository includes a GitHub Actions workflow (`.github/workflows/codeql-ana
 - Automatically scan the code on push to main/master branches
 - Scan pull requests
 - Run weekly security scans
-- Detect 250+ security vulnerabilities across 50+ CWE categories including:
+- Detect 300+ security vulnerabilities across 55+ CWE categories including:
   - CWE-22, CWE-74, CWE-77, CWE-79, CWE-89, CWE-91, CWE-93, CWE-95, CWE-113, CWE-116, CWE-117
   - CWE-129, CWE-185, CWE-190, CWE-191, CWE-197, CWE-200, CWE-203, CWE-208, CWE-209
   - CWE-221, CWE-227, CWE-248, CWE-252, CWE-256, CWE-259, CWE-260, CWE-266, CWE-271, CWE-273
   - CWE-284, CWE-285, CWE-287, CWE-290, CWE-295, CWE-297, CWE-311, CWE-312, CWE-315, CWE-319
-  - CWE-326, CWE-327, CWE-328, CWE-330, CWE-338, CWE-352, CWE-400, CWE-404, CWE-497, CWE-502
-  - CWE-601, CWE-611, CWE-798
+  - CWE-326, CWE-327, CWE-328, CWE-330, CWE-337, CWE-338, CWE-352, CWE-367, CWE-382, CWE-398
+  - CWE-400, CWE-404, CWE-497, CWE-502, CWE-601, CWE-611, CWE-798
 
 ## Running CodeQL Locally
 
